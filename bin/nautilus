@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# workaround for https://bugs.launchpad.net/ubuntu/+source/nautilus/+bug/2064566
+
+GTK_THEME=Adwaita-dark /usr/bin/nautilus
