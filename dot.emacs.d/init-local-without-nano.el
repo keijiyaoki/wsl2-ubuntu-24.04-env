@@ -247,6 +247,25 @@
   :custom-face
   (dashboard-heading . '((t (:foreground "#f1fa8c" :weight bold)))))
 
+(leaf *wl-clipboard
+  ;; credit: yorickvP on Github
+  :preface
+  (setq wl-copy-process nil)
+  (defun wl-copy (text)
+    (setq wl-copy-process (make-process :name "wl-copy"
+                                        :buffer nil
+                                        :command '("wl-copy" "-f" "-n")
+                                        :connection-type 'pipe
+                                        :noquery t))
+    (process-send-string wl-copy-process text)
+    (process-send-eof wl-copy-process))
+  (defun wl-paste ()
+    (if (and wl-copy-process (process-live-p wl-copy-process))
+        nil ; should return nil if we're the current paste owner
+      (shell-command-to-string "wl-paste -n | tr -d \r")))
+  (setq interprogram-cut-function 'wl-copy)
+  (setq interprogram-paste-function 'wl-paste))
+
 ;; -----------------------------------------------------------------------------------------
 ;;
 ;; GNU/Linux
@@ -1929,21 +1948,6 @@
 ;; Search Interface
 ;;
 ;; -----------------------------------------------------------------------------------------
-
-(leaf migemo
-  :doc "Japanese increment search with 'Romanization of Japanese'"
-  :url "https://github.com/emacs-jp/migemo"
-  :if (executable-find "cmigemo")
-  :ensure t
-  :require migemo
-  :custom
-  (migemo-options          . '("-q" "--nonewline" "--emacs"))
-  (migemo-command          . "/usr/bin/cmigemo")
-  (migemo-dictionary       . "/usr/share/cmigemo/utf-8/migemo-dict")
-  (migemo-user-dictionary  . nil)
-  (migemo-regex-dictionary . nil)
-  (migemo-coding-system    . 'utf-8-unix)
-  :hook (after-init-hook . migemo-init))
 
 (leaf anzu
   :doc "Displays current match and total matches information"
